@@ -11,8 +11,7 @@ export class HomeController {
     @Get('/hello')
     async getData(@Req() req: any, @Res() res: any, @Body() body: any): Promise<any> {
         try {
-            let response = await this.elasticSearch.fetchData({});
-            res.send(response);
+            res.json({ isSuccess: true });
         } catch (error) {
             return { isSuccess: false };
         }
