@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "paths": { "*": ["types/*"] },
+        "module": "commonjs",
+        "target": "es6",
+        "lib": [
+            "es6"
+        ],
+        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "outDir": "dist",
+        "baseUrl": ".",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "allowJs": true
+    },
+    "include": [
+        "src/**/*.ts"
+    ]
+}
