@@ -23,6 +23,7 @@
     "request": "2.78.0",
     "routing-controllers": "0.7.6",
     "typedi": "0.6.0",
+    "watson-developer-cloud": "^4.0.1",
     "winston": "2.4.0"
   },
   "devDependencies": {
