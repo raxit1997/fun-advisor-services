@@ -23,7 +23,7 @@ export class ShoppingController {
             let latitude = req.headers.latitude;
             let longitude = req.headers.longitude;
             let queryString = req.query.text;
-            let requestURL = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${queryString}&inputtype=textquery&fields=photos,place_id,types,formatted_address,name,opening_hours,rating,price_level&locationbias=point:${latitude},${longitude}&key=AIzaSyCCGb_0fod9vxW27A5iuYwNbW_x2JiCAvc`;
+            let requestURL = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${queryString}&inputtype=textquery&fields=photos,place_id,types,formatted_address,name,opening_hours,rating,price_level&locationbias=point:${latitude},${longitude}&key=`;
             let response = await this.googleMapsAPI.fetchData(requestURL);
             let result = this.retrieveShopSearch(response);
             return this.responseUtility.generateResponse(true, result);
