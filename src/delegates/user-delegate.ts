@@ -1,11 +1,11 @@
 import { Inject } from 'typedi';
 import winston = require('winston');
 
-import { UserRegisterRequest } from '../models/UserRegisterRequest';
+import { UserRegisterRequest } from '../models/user/UserRegisterRequest';
 import { ElasticSearch } from '../services/elastic-search';
 import * as crypto from 'crypto';
-import { LoginUserRequest } from '../models/LoginUserRequest';
-import { GetUserResponse } from '../models/GetUserResponse';
+import { LoginUserRequest } from '../models/user/LoginUserRequest';
+import { GetUserResponse } from '../models/user/GetUserResponse';
 import { Config } from '../config/config';
 
 export class UserDelegate {

@@ -4,12 +4,12 @@ export class GetUserResponse {
     firstName: string;
     lastName: string;
     contact: string;
-    latitude: Number;
-    longitude: Number;
+    latitude: number;
+    longitude: number;
     location: string;
     isAuthenticated: boolean;
     
-    constructor (userID: string, firstName: string, lastName: string, contact: string, location: string, latitude: Number, longitude: Number) {
+    constructor (userID: string, firstName: string, lastName: string, contact: string, location: string, latitude: number, longitude: number) {
         this.userID = userID;
         this.firstName = firstName;
         this.lastName = lastName;

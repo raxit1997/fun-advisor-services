@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import * as elasticsearch from 'elasticsearch';
 import { Service } from 'typedi';
 import winston = require('winston');
+import { Config } from '../config/config';
 
 @Service('elastic.search')
 export class ElasticSearch {
@@ -12,10 +13,10 @@ export class ElasticSearch {
     constructor() {
         this.client = new elasticsearch.Client({
             host: [{
-                host: '2d1d92f7f88044a597e8b7f45042d1de.ap-southeast-1.aws.found.io',
-                auth: 'elastic:2RAFiQEpX3SoghfSLq8djmlV',
+                host: Config.ELASTiC_SEARCH_HOST,
+                auth: Config.ELASTIC_SEARCH_AUTH,
                 protocol: 'https',
-                port: 9243
+                port: Config.ELASTIC_SEARCH_PORT
             }]
         });
     }

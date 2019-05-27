@@ -5,6 +5,8 @@ import * as express from 'express';
 import { ElasticSearch } from '../services/di.config';
 import { UserDelegate } from '../delegates/user-delegate';
 import { ResponseUtility } from '../utils/response-utility';
+import { LoginUserRequest } from '../models/user/LoginUserRequest';
+import { UserRegisterRequest } from '../models/user/UserRegisterRequest';
 
 @Service()
 @Controller()
@@ -19,7 +21,7 @@ export class UserController {
     }
 
     @Post('/register-user')
-    async registerUser(@Req() req: any, @Res() res: any, @Body() body: any): Promise<any> {
+    async registerUser(@Req() req: any, @Res() res: any, @Body() body: UserRegisterRequest): Promise<any> {
         try {
             let response = await this.userDelegate.registerUser(body);
             return this.responseUtility.generateResponse(true, { isUserRegistered: response });
@@ -30,7 +32,7 @@ export class UserController {
     }
 
     @Post('/login')
-    async userLogin(@Req() req: any, @Res() res: any, @Body() body: any): Promise<any> {
+    async userLogin(@Req() req: any, @Res() res: any, @Body() body: LoginUserRequest): Promise<any> {
         try {
             let response = await this.userDelegate.loginUser(body);
             return this.responseUtility.generateResponse(true, response);
@@ -41,7 +43,7 @@ export class UserController {
     }
 
     @Get('/user/:userID')
-    async geUserDetails(@Req() req: express.Request, @Res() res: any, @Body() body: any): Promise<any> {
+    async geUserDetails(@Req() req: express.Request, @Res() res: any): Promise<any> {
         try {
             let response = await this.userDelegate.getUserDetails(req.params.userID);
             return this.responseUtility.generateResponse(true, response);
