@@ -8,7 +8,7 @@ export class WatsonAPI {
     naturalLanguageClassifier : any;
     constructor() {
         this.naturalLanguageClassifier = new NaturalLanguageClassifierV1({
-            iam_apikey: ''
+            iam_apikey: 'zVGmCt-qPvwIrXNFzlcV9l399ArWG1d93kcSa7BWBTi-'
         });
      }
 
