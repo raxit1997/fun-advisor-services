@@ -6,4 +6,7 @@ export class Shop {
     placeId : string;
     photoReference : string;
     types : string[];
+    latitude : string;
+    longitude : string;
+    imageLink : string;
 }

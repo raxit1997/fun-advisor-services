@@ -21,4 +21,7 @@ export class Config {
         INDEX: 'places',
         MAPPING: 'places-detail'
     };
+    public static WATSON_API_KEY : string = 'zVGmCt-qPvwIrXNFzlcV9l399ArWG1d93kcSa7BWBTi-';
+    public static WATSON_CLASSIFIER : string = '5a2fdax550-nlc-2572';
+    public static GOOGLE_PLACES_KEY : string = 'AIzaSyCCGb_0fod9vxW27A5iuYwNbW_x2JiCAvc';
 }
