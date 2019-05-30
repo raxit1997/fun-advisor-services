@@ -137,10 +137,7 @@ export class UserDelegate {
 
     async getPlaceOverview(placeID: string) {
         try {
-            let elasticSearchQueryBuilder: ElasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
-            elasticSearchQueryBuilder.addProperty(QueryProperties.QueryInclude, { match: { placeID: placeID } });
-            let placesOverviewData = await this.elasticSearch.fetchDataByQuery(elasticSearchQueryBuilder.query, Config.PLACES_REVIEW_TABLE.INDEX, Config.PLACES_REVIEW_TABLE.MAPPING);
-            return placesOverviewData[0];
+            return this.elasticSearch.fetchDataByID(`${placeID}`, Config.PLACES_REVIEW_TABLE.INDEX, Config.PLACES_REVIEW_TABLE.MAPPING);
         } catch (error) {
             winston.error(JSON.stringify(error));
             return Promise.reject('');
