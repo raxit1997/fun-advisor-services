@@ -24,8 +24,8 @@ export class ShoppingController {
             let longitude = req.headers.longitude;
             let queryString = req.params.text;
             let requestURL = `https://maps.googleapis.com/maps/api/place/textsearch/json?key=${Config.GOOGLE_PLACES_KEY}&query=${queryString}&location=${latitude},${longitude}`;
-            if (req.headers.nextPageToken) {
-                requestURL = `${requestURL}&pagetoken=${req.headers.nextPageToken}`;
+            if (req.headers.nextpagetoken) {
+                requestURL = `${requestURL}&pagetoken=${req.headers.nextpagetoken}`;
             }
             let response: any = await this.googleMapsAPI.fetchData(requestURL);
             let token = response.next_page_token;
