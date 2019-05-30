@@ -21,7 +21,7 @@ export class ElasticSearch {
         });
     }
 
-    async fetchData(query: any, indexName: string, mappingName: string) {
+    async fetchDataByQuery(query: any, indexName: string, mappingName: string): Promise<any> {
         try {
             const response = await this.client.search({
                 index: indexName,
@@ -35,7 +35,7 @@ export class ElasticSearch {
         }
     }
 
-    async fetchDataByID(id: string, indexName: string, mappingName: string) {
+    async fetchDataByID(id: string, indexName: string, mappingName: string): Promise<any> {
         try {
             const response = await this.client.get({
                 id: id,
@@ -45,13 +45,13 @@ export class ElasticSearch {
             return response._source;
         } catch (error) {
             winston.error(JSON.stringify(error));
-            return Promise.reject(error);
+            return false;
         }
     }
 
-    async insertData(document: any, indexName: string, mappingName: string, id?: string) {
+    async insertData(document: any, indexName: string, mappingName: string, id?: string): Promise<any> {
         try {
-            const response = await this.client.create({
+            const response = await this.client.index({
                 id: id,
                 index: indexName,
                 type: mappingName,
@@ -64,13 +64,15 @@ export class ElasticSearch {
         }
     }
 
-    async updateData(document: any, indexName: string, mappingName: string, id?: string) {
+    async updateData(document: any, indexName: string, mappingName: string, id: string): Promise<any> {
         try {
             const response = await this.client.update({
                 id: id,
                 index: indexName,
                 type: mappingName,
-                body: document
+                body: {
+                    doc: document
+                }
             });
             return response;
         } catch (error) {
@@ -78,5 +80,4 @@ export class ElasticSearch {
             return Promise.reject(error);
         }
     }
-
 }

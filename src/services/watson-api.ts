@@ -18,7 +18,7 @@ export class WatsonAPI {
             return new Promise((resolve: any, reject: any) => {
                 this.naturalLanguageClassifier.classify({
                     text: text,
-                    classifier_id: Config.WATSON_API_KEY
+                    classifier_id: Config.WATSON_CLASSIFIER
                 },
                     function (err: any, response: any) {
                         if (err) {
