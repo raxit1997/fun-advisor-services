@@ -23,9 +23,26 @@ export class FoodController {
     @Post('/getRestaurants')
     async getRestaurants(@Req() req: express.Request, @Res() res: express.Response, @Body() body: GetRestaurantsRequest): Promise<any> {
         try {
-            let response: any = await this.zomatoAPI.fetchData(`${Config.ZOMATO_BASE_URL}/search?
-                count=50&lat=${body.latitude}&lon=${body.longitude}&cuisines=${body.cuisineID}&order=${body.order ? body.order : 'asc'}
-                &sort=${body.sortBy}&start=${body.start}`);
+            let requestURL: string = `${Config.ZOMATO_BASE_URL}/search?
+           lat=${body.latitude}&lon=${body.longitude}&order=${body.order ? body.order : 'asc'}
+            &sort=${body.sortBy}&start=${body.start}`;
+            if(body.cuisineIDs) {
+                requestURL+=`&cuisines=${body.cuisineIDs}`;
+            }
+            if(body.establishmentID) {
+                requestURL+=`&establishment_type=${body.establishmentID}`;
+            }
+            if(body.categoryIDs) {
+                requestURL+=`&category=${body.categoryIDs}`;
+            }
+            if(body.collectionID) {
+                requestURL+=`&collection_id=${body.collectionID}`;
+            }
+            // Search query
+            if(body.searchQuery) {
+                requestURL+=`&q=${body.searchQuery}`;
+            }
+            let response: any = await this.zomatoAPI.fetchData(requestURL);
             return this.responseUtility.generateResponse(true, response);
         } catch (error) {
             return this.responseUtility.generateResponse(false, error);
@@ -66,6 +83,7 @@ export class FoodController {
         }
     }
 
+    // Used for details view, given the restaurant ID
     @Post('/getReviews')
     async getReviews(@Req() req: any, @Res() res: any, @Body() body: any): Promise<any> {
         try {
@@ -87,6 +105,7 @@ export class FoodController {
         }
     }
 
+    // For location details
     @Post('/getLocation')
     async getLocation(@Req() req: any, @Res() res: any, @Body() body: any): Promise<any> {
         try {
