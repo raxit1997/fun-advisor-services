@@ -4,7 +4,7 @@ export class UserPlacesRequest {
     categoryName: string;
     subCategories: Array<string>;
     ratings: number;
-    reviews: Array<string>;
+    reviews: string;
     priceRange: number;
     budget: number;
     budgetNoOfPeople: number;

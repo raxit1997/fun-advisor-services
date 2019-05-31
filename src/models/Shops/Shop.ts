@@ -1,3 +1,5 @@
+import { ReviewsTagScore } from "../user/ESMapping";
+
 export class Shop {
     address: string;
     name: string;
@@ -11,18 +13,6 @@ export class Shop {
     imageLink: string;
     ratings: number;
     reviews: string[];
-    score: Score;
-}
-
-export class Score {
-    positiveCustomerService: number;
-    negativeCustomerService: number;
-    positiveQuality: number;
-    negativeQuality: number;
-    positiveAvailability: number;
-    negativeAvailability: number;
-    positiveWorthForPrice: number;
-    negativeWorthForPrice: number;
-    positiveOthers: number;
-    negativeOthers: number;
+    ratingCount: number;
+    score: ReviewsTagScore;
 }
