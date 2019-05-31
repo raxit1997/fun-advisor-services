@@ -45,7 +45,7 @@ export class ShoppingController {
             let shop = new Shop();
             shop.name = candidate.name;
             shop.address = candidate.formatted_address;
-            shop.openNow = candidate.opening_hours ? candidate.opening_hours.open_now : 'NA';
+            shop.openNow = candidate.opening_hours ? candidate.opening_hours.open_now : '-';
             shop.placeId = candidate.place_id;
             shop.rating = candidate.rating;
             shop.types = candidate.types;
