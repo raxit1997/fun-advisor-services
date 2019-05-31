@@ -6,6 +6,7 @@ import { GetRestaurantsRequest } from '../models/zomato/GetRestaurantsRequest';
 import { GetCityIDRequest } from '../models/zomato/GetCityIDRequest';
 import { ResponseUtility } from '../utils/response-utility';
 import { Config } from '../config/config';
+import { FoodService } from '../services/food-service';
 
 @Service()
 @Controller()
@@ -13,7 +14,7 @@ export class FoodController {
 
     responseUtility: ResponseUtility;
 
-    constructor(@Inject('zomato.api') private zomatoAPI: ZomatoAPI) {
+    constructor(@Inject('zomato.api') private zomatoAPI: ZomatoAPI, @Inject('food.service') private foodService: FoodService) {
         this.responseUtility = new ResponseUtility();
     }
 
@@ -24,7 +25,7 @@ export class FoodController {
     async getRestaurants(@Req() req: express.Request, @Res() res: express.Response, @Body() body: GetRestaurantsRequest): Promise<any> {
         try {
             let requestURL: string = `${Config.ZOMATO_BASE_URL}/search?
-           lat=${body.latitude}&lon=${body.longitude}&order=${body.order ? body.order : 'asc'}
+            lat=${body.latitude}&lon=${body.longitude}&order=${body.order ? body.order : 'asc'}
             &sort=${body.sortBy}&start=${body.start}`;
             if(body.cuisineIDs) {
                 requestURL+=`&cuisines=${body.cuisineIDs}`;
@@ -43,7 +44,8 @@ export class FoodController {
                 requestURL+=`&q=${body.searchQuery}`;
             }
             let response: any = await this.zomatoAPI.fetchData(requestURL);
-            return this.responseUtility.generateResponse(true, response);
+            let result = this.foodService.fetchRestaurantResponse(response);
+            return this.responseUtility.generateResponse(true, result);
         } catch (error) {
             return this.responseUtility.generateResponse(false, error);
         }
