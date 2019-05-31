@@ -91,7 +91,8 @@ export class FoodController {
         try {
             let response: any = await this.zomatoAPI.fetchData(`${Config.ZOMATO_BASE_URL}/reviews?
                 res_id=${body.res_id}`);
-            return this.responseUtility.generateResponse(true, response);
+            let reviews = this.foodService.fetchReviews(response);
+            return this.responseUtility.generateResponse(true, reviews);
         } catch (error) {
             return this.responseUtility.generateResponse(false, error);
         }
