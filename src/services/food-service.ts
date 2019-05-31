@@ -3,6 +3,7 @@ import { Service } from 'typedi';
 import { get } from 'request';
 import { Config } from '../config/config';
 import { RestaurantResponse } from '../models/zomato/RestaurantResponse';
+import { ReviewResponse } from '../models/zomato/ReviewResponse';
 
 @Service('food.service')
 export class FoodService {
@@ -41,6 +42,29 @@ export class FoodService {
             return results;
     
         } catch (error) {
+            console.log(error);
+        }
+    }
+
+    public fetchReviews(response: any) {
+        try {
+            let results = new Array<ReviewResponse>();
+            let reviews = response.user_reviews;
+            reviews.forEach((reviewResult: any) => {
+                let reviewObject = new ReviewResponse();
+                let review = reviewResult.review;
+                reviewObject.reviewID = review.id;
+                reviewObject.rating = review.rating;
+                reviewObject.ratingText = review.rating_text;
+                reviewObject.reviewText = review.review_text;
+                reviewObject.likes = review.likes;
+                if(review.user) {
+                reviewObject.username = review.user.name;
+                }
+                results.push(reviewObject);
+            });
+            return results;
+        } catch(error) {
             console.log(error);
         }
     }
