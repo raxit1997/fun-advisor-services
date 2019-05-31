@@ -145,7 +145,7 @@ export class UserDelegate {
                 }
             });
             await this.elasticSearch.updateData(userPlacesData, Config.PLACES_TABLE.INDEX, Config.PLACES_TABLE.MAPPING, `${body.placeID}`);
-            return Promise.resolve();
+            return userPlacesData;
             // let elasticSearchQueryBuilder: ElasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
             // elasticSearchQueryBuilder.addProperty(QueryProperties.QueryInclude, { match: { userID: body.userID } });
             // elasticSearchQueryBuilder.addProperty(QueryProperties.QueryInclude, { match: { categoryName: body.categoryName } });
