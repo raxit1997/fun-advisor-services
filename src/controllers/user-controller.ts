@@ -7,7 +7,7 @@ import { UserDelegate } from '../delegates/user-delegate';
 import { LoginUserRequest } from '../models/user/LoginUserRequest';
 import { UserPlacesRequest } from '../models/user/UserPlacesRequest';
 import { UserRegisterRequest } from '../models/user/UserRegisterRequest';
-import { ElasticSearch } from '../services/di.config';
+import { ElasticSearch, WatsonAPI } from '../services/di.config';
 import { ResponseUtility } from '../utils/response-utility';
 
 @Service()
@@ -17,8 +17,9 @@ export class UserController {
     userDelegate: UserDelegate;
     responseUtility: ResponseUtility;
 
-    constructor(@Inject('elastic.search') private elasticSearch: ElasticSearch) {
-        this.userDelegate = new UserDelegate(elasticSearch);
+    constructor(@Inject('elastic.search') private elasticSearch: ElasticSearch,
+        @Inject('watson.api') private watsonAPI: WatsonAPI) {
+        this.userDelegate = new UserDelegate(elasticSearch, watsonAPI);
         this.responseUtility = new ResponseUtility();
     }
 
@@ -55,16 +56,16 @@ export class UserController {
         }
     }
 
-    @Put('/searched-place')
-    async searchedPlace(@Req() req: any, @Res() res: any, @Body() body: UserPlacesRequest): Promise<any> {
-        try {
-            let response = await this.userDelegate.searchedPlace(body);
-            return this.responseUtility.generateResponse(true, response);
-        } catch (error) {
-            winston.error(JSON.stringify(error));
-            return this.responseUtility.generateResponse(false, error);
-        }
-    }
+    // @Put('/searched-place')
+    // async searchedPlace(@Req() req: any, @Res() res: any, @Body() body: UserPlacesRequest): Promise<any> {
+    //     try {
+    //         let response = await this.userDelegate.searchedPlace(body);
+    //         return this.responseUtility.generateResponse(true, response);
+    //     } catch (error) {
+    //         winston.error(JSON.stringify(error));
+    //         return this.responseUtility.generateResponse(false, error);
+    //     }
+    // }
 
     @Put('/visited-place')
     async visitedPlace(@Req() req: any, @Res() res: any, @Body() body: UserPlacesRequest): Promise<any> {
@@ -99,10 +100,10 @@ export class UserController {
         }
     }
 
-    @Get('/place-overview/:placeID')
-    async getPlaceOverview(@Req() req: express.Request, @Res() res: any): Promise<any> {
+    @Post('/place-overview')
+    async getPlaceOverview(@Req() req: express.Request, @Res() res: any, @Body() body: any): Promise<any> {
         try {
-            let response = await this.userDelegate.getPlaceOverview(req.params.placeID);
+            let response = await this.userDelegate.getPlaceOverview(body);
             return this.responseUtility.generateResponse(true, response);
         } catch (error) {
             winston.error(JSON.stringify(error));

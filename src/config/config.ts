@@ -17,11 +17,23 @@ export class Config {
         INDEX: 'user-category',
         MAPPING: 'user-category-detail'
     };
-    public static PLACES_REVIEW_TABLE = {
+    public static PLACES_TABLE = {
         INDEX: 'places',
         MAPPING: 'places-detail'
     };
     public static WATSON_API_KEY : string = 'zVGmCt-qPvwIrXNFzlcV9l399ArWG1d93kcSa7BWBTi-';
-    public static WATSON_CLASSIFIER : string = '5612f0x547-nlc-2770';
+    public static WATSON_CLASSIFIER : string = '0af0c8x553-nlc-35';
     public static GOOGLE_PLACES_KEY : string = 'AIzaSyCCGb_0fod9vxW27A5iuYwNbW_x2JiCAvc';
+    public static WATSON_REVIEW_CLASSIFIERS: any = {
+        "Positive-Customer-Service": "PositiveCustomerService",
+        "Negative-Customer-Service": "NegativeCustomerService",
+        "Positive-Quality": "PositiveQuality",
+        "Negative-Worth-For-Price": "NegativeWorthForPrice",
+        "Positive-Availability": "PositiveAvailability",
+        "Positive": "Positive",
+        "Negative-Availability": "NegativeAvailability",
+        "Negative-Quality": "NegativeQuality",
+        "Positive-Worth-For-Price": "PositiveWorthForPrice",
+        "Negative": "Negative"
+    };
 }
