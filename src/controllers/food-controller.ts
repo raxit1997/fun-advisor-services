@@ -98,16 +98,18 @@ export class FoodController {
                         }
                     });
                 });
-            }
-            if(body.budget && result) {
-                const restaurants = result.map(res => {
-                    if(res.cost <= body.budget) {
-                        return res;
-                    }
-                })
-                return this.responseUtility.generateResponse(true, restaurants);
+                if(body.budget && result) {
+                    const restaurants = result.map(res => {
+                        if(res.cost <= body.budget) {
+                            return res;
+                        }
+                    })
+                    return this.responseUtility.generateResponse(true, restaurants);
+                } else {
+                    return this.responseUtility.generateResponse(true, result);
+                }
             } else {
-                return this.responseUtility.generateResponse(true, result);
+                return this.responseUtility.generateResponse(true, zomatoAPIResponse);
             }
         } catch (error) {
             return this.responseUtility.generateResponse(false, error);
