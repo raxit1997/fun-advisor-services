@@ -98,8 +98,10 @@ export class FoodController {
                         }
                     });
                 });
+                return this.responseUtility.generateResponse(true, result);
+            } else {
+                return this.responseUtility.generateResponse(true, zomatoAPIResponse);
             }
-            return this.responseUtility.generateResponse(true, result);
         } catch (error) {
             return this.responseUtility.generateResponse(false, error);
         }
