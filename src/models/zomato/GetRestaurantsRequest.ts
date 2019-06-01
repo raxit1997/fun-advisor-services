@@ -12,4 +12,5 @@ export class GetRestaurantsRequest {
     categoryIDs?: string;
     collectionID?: string;
     searchQuery?: string;
+    budget?: number;
 }

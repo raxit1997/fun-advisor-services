@@ -99,7 +99,16 @@ export class FoodController {
                     });
                 });
             }
-            return this.responseUtility.generateResponse(true, result);
+            if(body.budget && result) {
+                const restaurants = result.map(res => {
+                    if(res.cost <= body.budget) {
+                        return res;
+                    }
+                })
+                return this.responseUtility.generateResponse(true, restaurants);
+            } else {
+                return this.responseUtility.generateResponse(true, result);
+            }
         } catch (error) {
             return this.responseUtility.generateResponse(false, error);
         }
