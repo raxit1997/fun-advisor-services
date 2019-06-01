@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res, Body } from 'routing-controllers';
+import { Controller, Get, Req, Res, Body, Post } from 'routing-controllers';
 import { Service, Inject } from 'typedi';
 import { ResponseUtility } from '../utils/response-utility';
 import { GoogleMapsAPI, ElasticSearch } from '../services/di.config';
@@ -18,9 +18,80 @@ export class AttractionsController {
         this.responseUtility = new ResponseUtility();
     }
 
+    @Post('/nearByAttractions')
+    async nearByAttractions(@Req() req: any, @Res() res: any, @Body() body: any): Promise<any> {
+        try {
+            let latitude = req.headers.latitude;
+            let longitude = req.headers.longitude;
+            let queryString = 'top+attractions';
+            let placeId = req.body.placeId;
+            let mode =  req.body.mode;
+            let requestURL = `https://maps.googleapis.com/maps/api/place/textsearch/json?key=${Config.GOOGLE_PLACES_KEY}&query=${queryString}&location=${latitude},${longitude}`;
+            let response: any = await this.googleMapsAPI.fetchData(requestURL);
+            response = this.sortLocations(response, latitude, longitude, placeId);
+            // let matrix = await this.getDistanceMatrix(placeId, response[0].name, response[1].name, response[2].name, response[3].name, response[4].name);
+            let matrix = await this.getDistanceMatrix(placeId, response[0].geometry.location.lat, response[0].geometry.location.lng, response[1].geometry.location.lat, response[1].geometry.location.lng, response[2].geometry.location.lat, response[2].geometry.location.lng, response[3].geometry.location.lat, response[3].geometry.location.lng, response[4].geometry.location.lat, response[4].geometry.location.lng, mode)
+            return this.responseUtility.generateResponse(true, { matrix: matrix });
+        } catch (err) {
+            return { isSuccess: false };
+        }
+
+    }
 
 
-    @Get('/attractionsResults/:text')
+     async getDistanceMatrix(placeID: string, lat1: number, lng1: number, lat2: number, lng2: number, lat3: number, lng3: number, lat4: number, lng4: number, lat5: number, lng5: number , mode : string) {
+ 
+         let requestURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&destinations=${lat1},${lng1}|${lat2},${lng2}|${lat3},${lng3}|${lat4},${lng4}|${lat5},${lng5}|&origins=place_id:${placeID}|${lat1},${lng1}|${lat2},${lng2}|${lat3},${lng3}|${lat4},${lng4}&key=AIzaSyAIobRY-GzOLqLzFzsX-GYkgPkYDuHqWxU&mode=${mode}`;
+         let response: any = await this.googleMapsAPI.fetchData(requestURL);
+         return response;
+     } 
+
+    sortLocations(response: any, lat: number, lng: number, placeID: string) {
+        try {
+            let candidates = response.results;
+            let attractions: Attraction[] = [];
+
+            candidates.forEach((candidate: any) => {
+                candidate.distance = this.getDistanceBetweenLocations(candidate.geometry.location.lat, candidate.geometry.location.lng, lat, lng);
+                if (candidate.placeId !== placeID) {
+                    attractions.push(candidate);
+                }
+            });
+
+            attractions = attractions.sort((a: any, b: any) => {
+                return a.distance > b.distance ? 1 : -1;
+            });
+            return attractions;
+        } catch (err) {
+
+        }
+
+    }
+
+    deg2Rad(distance: number) {
+        return distance * Math.PI / 180;
+    }
+
+    getDistanceBetweenLocations(lat1: number, lng1: number, lat2: number, lng2: number): number {
+        var deg2Rad = (deg: any) => {
+            return deg * Math.PI / 180;
+        }
+        var r = 3956; // Radius of the earth in miles
+        var dLat = this.deg2Rad(lat2 - lat1);
+        var dLon = this.deg2Rad(lng2 - lng1);
+        var a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(this.deg2Rad(lat1)) * Math.cos(this.deg2Rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = r * c; // Distance in miles
+        return d;
+    }
+
+
+
+
+    @Get('/attractionResults/:text')
     async searchShops(@Req() req: any, @Res() res: any, @Body() body: any): Promise<any> {
         try {
             let latitude = req.headers.latitude;
