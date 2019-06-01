@@ -1,6 +1,6 @@
 export class GetRestaurantsRequest {
-    latitude: string
-    longitude: string
+    latitude: number;
+    longitude: number;
     cuisineIDs?: string;
     sortBy: string;
     radius: number;

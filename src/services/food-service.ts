@@ -4,6 +4,8 @@ import { get } from 'request';
 import { Config } from '../config/config';
 import { RestaurantResponse } from '../models/zomato/RestaurantResponse';
 import { ReviewResponse } from '../models/zomato/ReviewResponse';
+import { CollectionResponse } from '../models/zomato/CollectionResponse';
+import { CityResponse } from '../models/zomato/CityResponse';
 
 @Service('food.service')
 export class FoodService {
@@ -64,6 +66,40 @@ export class FoodService {
                 results.push(reviewObject);
             });
             return results;
+        } catch(error) {
+            console.log(error);
+        }
+    }
+
+    public fetchCollections(response: any) {
+        try {
+            let results = new Array<CollectionResponse>();
+            let collections = response.collections;
+            collections.forEach((collectionResult: any) => {
+                let collectionObject = new CollectionResponse();
+                let collection = collectionResult.collection;
+                collectionObject.id = collection.collection_id;
+                collectionObject.description = collection.description;
+                collectionObject.title = collection.title;
+                collectionObject.imageURL = collection.image_url;
+                results.push(collectionObject);
+            });
+            return results;
+        } catch(error) {
+            console.log(error);
+        }
+    }
+
+    public fetchCity(response: any) {
+        try {
+            const location = response.location_suggestions;
+            let city = new CityResponse();
+            city.cityID = location[0].id;
+            city.countryID = location[0].country_id;
+            city.name = location[0].name;
+            city.countryName = location[0].country_name;
+            return city;
+            
         } catch(error) {
             console.log(error);
         }
