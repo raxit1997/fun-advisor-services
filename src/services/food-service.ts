@@ -6,6 +6,9 @@ import { RestaurantResponse } from '../models/zomato/RestaurantResponse';
 import { ReviewResponse } from '../models/zomato/ReviewResponse';
 import { CollectionResponse } from '../models/zomato/CollectionResponse';
 import { CityResponse } from '../models/zomato/CityResponse';
+import { EstablishmentResponse } from '../models/zomato/EstablishmentResponse';
+import { CuisineResponse } from '../models/zomato/CuisineResponse';
+import { CategoryResponse } from '../models/zomato/CategoryResponse';
 
 @Service('food.service')
 export class FoodService {
@@ -105,4 +108,50 @@ export class FoodService {
         }
     }
 
+    public fetchEstablishments(response: any) {
+        try {
+            let results = new Array<EstablishmentResponse>();
+            let establishments = response.establishments;
+            establishments.forEach((establishmentResult: any) => {
+                results.push(establishmentResult.establishment);
+            });
+            return results;
+        } catch(error) {
+            console.log(error);
+        }
+    }
+
+    public fetchCuisines(response: any) {
+        try {
+            let results = new Array<CuisineResponse>();
+            let cuisines = response.cuisines;
+            cuisines.forEach((cuisineResult: any) => {
+                let cuisineObject = new CuisineResponse();
+                let cuisine = cuisineResult.cuisine;
+                cuisineObject.id = cuisine.cuisine_id;
+                cuisineObject.name = cuisine.cuisine_name;
+                results.push(cuisineObject);
+            });
+            return results;
+        } catch(error) {
+            console.log(error);
+        }
+    }
+
+    public fetchCategories(response: any) {
+        try {
+            let results = new Array<CategoryResponse>();
+            let categories = response.categories;
+            categories.forEach((categoryResult: any) => {
+                let categoryObject = new CategoryResponse();
+                let category = categoryResult.categories;
+                categoryObject.id = category.id;
+                categoryObject.name = category.name;
+                results.push(categoryObject);
+            });
+            return results;
+        } catch(error) {
+            console.log(error);
+        }
+    }
 }

@@ -7,6 +7,7 @@ import { GetCityIDRequest } from '../models/zomato/GetCityIDRequest';
 import { ResponseUtility } from '../utils/response-utility';
 import { Config } from '../config/config';
 import { FoodService } from '../services/food-service';
+import { RecommenderAPI } from '../services/di.config';
 
 @Service()
 @Controller()
@@ -14,7 +15,8 @@ export class FoodController {
 
     responseUtility: ResponseUtility;
 
-    constructor(@Inject('zomato.api') private zomatoAPI: ZomatoAPI, @Inject('food.service') private foodService: FoodService) {
+    constructor(@Inject('zomato.api') private zomatoAPI: ZomatoAPI, @Inject('food.service') private foodService: FoodService,
+    @Inject("recommender.api") private recommenderAPI: RecommenderAPI) {
         this.responseUtility = new ResponseUtility();
     }
 
@@ -43,6 +45,7 @@ export class FoodController {
             }
             let response: any = await this.zomatoAPI.fetchData(requestURL);
             let result = this.foodService.fetchRestaurantResponse(response);
+            let recommender = await this.recommenderAPI.setDataForRecommender(result);
             return this.responseUtility.generateResponse(true, result);
         } catch (error) {
             return this.responseUtility.generateResponse(false, error);
@@ -65,7 +68,8 @@ export class FoodController {
     async getEstablishments(@Req() req: any, @Res() res: any, @Body() body: any): Promise<any> {
         try {
             let response: any = await this.zomatoAPI.fetchData(`${Config.ZOMATO_BASE_URL}/establishments?lat=${body.latitude}&lon=${body.longitude}&city_id=${body.cityID}`);
-            return this.responseUtility.generateResponse(true, response);
+            let result = this.foodService.fetchEstablishments(response);
+            return this.responseUtility.generateResponse(true, result);
         } catch (error) {
             return this.responseUtility.generateResponse(false, error);
         }
@@ -75,7 +79,8 @@ export class FoodController {
     async getCuisines(@Req() req: any, @Res() res: any, @Body() body: any): Promise<any> {
         try {
             let response: any = await this.zomatoAPI.fetchData(`${Config.ZOMATO_BASE_URL}/cuisines?lat=${body.latitude}&lon=${body.longitude}&city_id=${body.cityID}`);
-            return this.responseUtility.generateResponse(true, response);
+            let result = this.foodService.fetchCuisines(response);
+            return this.responseUtility.generateResponse(true, result);
         } catch (error) {
             return this.responseUtility.generateResponse(false, error);
         }
@@ -97,7 +102,8 @@ export class FoodController {
     async getCategories(@Req() req: any, @Res() res: any, @Body() body: any): Promise<any> {
         try {
             let response: any = await this.zomatoAPI.fetchData(`${Config.ZOMATO_BASE_URL}/categories`);
-            return this.responseUtility.generateResponse(true, response);
+            let result = this.foodService.fetchCategories(response);
+            return this.responseUtility.generateResponse(true, result);
         } catch (error) {
             return this.responseUtility.generateResponse(false, error);
         }
