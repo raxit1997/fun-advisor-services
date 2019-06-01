@@ -20,7 +20,7 @@ export class AttractionsController {
 
 
 
-    @Get('/attractionsResults/:text')
+    @Get('/attractionResults/:text')
     async searchShops(@Req() req: any, @Res() res: any, @Body() body: any): Promise<any> {
         try {
             let latitude = req.headers.latitude;
