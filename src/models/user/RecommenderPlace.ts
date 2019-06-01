@@ -1,5 +1,6 @@
 export class RecommenderPlace {
-	placeID: string;
-	averageRating: number;
-	ratingCount: number;
+	restaurantID: string;
+	rating: number;
+	votes: number;
+	cuisines: string;
 }

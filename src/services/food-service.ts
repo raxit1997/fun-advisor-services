@@ -24,7 +24,7 @@ export class FoodService {
             let restaurants = response.restaurants;
             if(restaurants) {
                 restaurants.forEach((restaurant: any) => {
-                    places.push(restaurant.id);
+                    places.push(restaurant.restaurant.id);
                 });
                 let elasticSearchQueryBuilder: ElasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
                 elasticSearchQueryBuilder.addProperty(QueryProperties.QueryInclude, { terms: { placeID: places } });

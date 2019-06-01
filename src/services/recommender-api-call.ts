@@ -5,15 +5,16 @@ import { Config } from '../config/config';
 import { Places, UserPlaces } from '../models/user/ESMapping';
 import { RecommenderModel } from '../models/zomato/RecommenderModel';
 import { RestaurantResponse } from '../models/zomato/RestaurantResponse';
+import { RecommenderPlace } from '../models/user/RecommenderPlace';
 
 @Service('recommender.api')
 export class RecommenderAPI {
 
     constructor() { }
 
-    async fetchData(placesData: RecommenderModel) {
+    async fetchData(placesData: RecommenderModel): Promise<any> {
         try {
-            const requestURL = `http://localhost:5002/recommendations`
+            const requestURL = `http://192.168.100.155:5002/recommendations`
             return new Promise((resolve: any, reject: any) => {
             post({
                 url: requestURL,
@@ -33,11 +34,10 @@ export class RecommenderAPI {
         }
     }
 
-    async setDataForRecommender(places: Array<RestaurantResponse>) {
-        let userPlace = new UserPlaces("1","69269","Food",["Cafe, Desserts, Beverages, Sandwich"]);
+    async setDataForRecommender(places: Array<RestaurantResponse>, userPlaces: Array<RecommenderPlace>) {
         let recommender = new RecommenderModel();
         recommender.places = places;
-        recommender.userPlaces = [userPlace];
+        recommender.userPlaces = userPlaces;
         let response = await this.fetchData(recommender);
         return response;
     }

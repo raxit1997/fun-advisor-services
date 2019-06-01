@@ -30,26 +30,26 @@ export class FoodController {
     @Post('/getRestaurants')
     async getRestaurants(@Req() req: express.Request, @Res() res: express.Response, @Body() body: GetRestaurantsRequest): Promise<any> {
         try {
-            let requestURL: string = `${Config.ZOMATO_BASE_URL}/search?lat=${body.latitude}&lon=${body.longitude}&order=${body.order ? body.order : 'asc'}&sort=${body.sortBy}&start=${body.start}`;
+            let requestURL: string = `${Config.ZOMATO_BASE_URL}/search?lat=${body.latitude}&lon=${body.longitude}&order=${body.order ? body.order : 'desc'}&sort=${body.sortBy}&start=${body.start}`;
             let places: Array<string> = new Array<string>();
-            if(body.cuisineIDs) {
-                requestURL+=`&cuisines=${body.cuisineIDs}`;
+            if (body.cuisineIDs) {
+                requestURL += `&cuisines=${body.cuisineIDs}`;
             }
-            if(body.establishmentID) {
-                requestURL+=`&establishment_type=${body.establishmentID}`;
+            if (body.establishmentID) {
+                requestURL += `&establishment_type=${body.establishmentID}`;
             }
-            if(body.categoryIDs) {
-                requestURL+=`&category=${body.categoryIDs}`;
+            if (body.categoryIDs) {
+                requestURL += `&category=${body.categoryIDs}`;
             }
-            if(body.collectionID) {
-                requestURL+=`&collection_id=${body.collectionID}`;
+            if (body.collectionID) {
+                requestURL += `&collection_id=${body.collectionID}`;
             }
             // Search query
-            if(body.searchQuery) {
-                requestURL+=`&q=${body.searchQuery}`;
+            if (body.searchQuery) {
+                requestURL += `&q=${body.searchQuery}`;
             }
             let recommenderPlaces: Array<RecommenderPlace> = [];
-            let response: any = await this.zomatoAPI.fetchData(requestURL);
+            let zomatoAPIResponse: any = await this.zomatoAPI.fetchData(requestURL);
             let elasticSearchQueryBuilder: ElasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
             if (Array.isArray(body.userID)) {
                 elasticSearchQueryBuilder.addProperty(QueryProperties.QueryInclude, { terms: { userID: body.userID } });
@@ -57,24 +57,49 @@ export class FoodController {
                 elasticSearchQueryBuilder.addProperty(QueryProperties.QueryInclude, { match: { userID: body.userID } });
             }
             let responses: any = await Promise.all([
-                this.foodService.fetchRestaurantResponse(response),
+                this.foodService.fetchRestaurantResponse(zomatoAPIResponse),
                 this.elasticSearch.fetchDataByQuery(elasticSearchQueryBuilder.query, Config.USER_PLACES_TABLE.INDEX, Config.USER_PLACES_TABLE.MAPPING)
             ]);
+            let placesCategories: any = {};
             let userPlacesResponse: Array<any> = responses[1];
             userPlacesResponse.forEach((userPlace: any) => {
-                places.push(userPlace._source.placeID);
+                if (userPlace._source.categoryName === 'FOOD') {
+                    places.push(userPlace._source.placeID);
+                    placesCategories[userPlace._source.placeID] = userPlace._source.subCategories.join(', ');
+                }
             });
             elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
             elasticSearchQueryBuilder.addProperty(QueryProperties.QueryInclude, { terms: { placeID: places } });
             let placesResponseFromES: Array<any> = await this.elasticSearch.fetchDataByQuery(elasticSearchQueryBuilder.query, Config.PLACES_TABLE.INDEX, Config.PLACES_TABLE.MAPPING);
-            placesResponseFromES.forEach((placeResponse: Places) => {
-                let recommenderPlace: RecommenderPlace = new RecommenderPlace();
-                recommenderPlace.averageRating = placeResponse.averageRating;
-                recommenderPlace.ratingCount = placeResponse.ratingCount;
-                recommenderPlace.placeID = placeResponse.placeID;
-                recommenderPlaces.push(recommenderPlace);
+            placesResponseFromES.forEach((placeResponse: any) => {
+                let pushPlace: boolean = true;
+                zomatoAPIResponse.restaurants.forEach((zomatoRestaurantResponse: any) => {
+                    if (zomatoRestaurantResponse.restaurant.id === placeResponse._source.placeID) {
+                        pushPlace = false;
+                    }
+                });
+                if (pushPlace) {
+                    let recommenderPlace: RecommenderPlace = new RecommenderPlace();
+                    recommenderPlace.rating = placeResponse._source.averageRating;
+                    recommenderPlace.votes = placeResponse._source.ratingCount;
+                    recommenderPlace.restaurantID = placeResponse._source.placeID;
+                    recommenderPlace.cuisines = placesCategories[recommenderPlace.restaurantID];
+                    recommenderPlaces.push(recommenderPlace);
+                    responses[0].push(recommenderPlace);
+                }
             });
-            return this.responseUtility.generateResponse(true, responses[0]);
+            let result: Array<any>;
+            if (recommenderPlaces.length != 0) {
+                result = await this.recommenderAPI.setDataForRecommender(responses[0], recommenderPlaces);
+                result.forEach((res: any) => {
+                    recommenderPlaces.forEach((recommenderPlace: RecommenderPlace, index: number) => {
+                        if (res.restaurantID === recommenderPlace.restaurantID) {
+                            result.splice(index, 1)
+                        }
+                    });
+                });
+            }
+            return this.responseUtility.generateResponse(true, result);
         } catch (error) {
             return this.responseUtility.generateResponse(false, error);
         }

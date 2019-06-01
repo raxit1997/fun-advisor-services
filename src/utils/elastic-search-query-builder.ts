@@ -6,6 +6,7 @@ export enum QueryProperties {
 
 export class ElasticSearchQueryBuilder {
     query: any = {
+        size: 500,
         query: {
             bool: {
                 must: [],
