@@ -45,6 +45,17 @@ export class UserController {
         }
     }
 
+    @Post('/retrieve-friends')
+    async retrieveFriends(@Req() req: any, @Res() res: any, @Body() body: any): Promise<any> {
+        try {
+            let response = await this.userDelegate.retrieveFriends(body);
+            return this.responseUtility.generateResponse(true, response);
+        } catch (error) {
+            winston.error(JSON.stringify(error));
+            return this.responseUtility.generateResponse(false, error);
+        }
+    }
+
     @Get('/user/:userID')
     async geUserDetails(@Req() req: express.Request, @Res() res: any): Promise<any> {
         try {

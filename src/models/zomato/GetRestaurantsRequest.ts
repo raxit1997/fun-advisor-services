@@ -1,4 +1,5 @@
 export class GetRestaurantsRequest {
+    userID: any;
     latitude: string
     longitude: string
     cuisineIDs?: string;

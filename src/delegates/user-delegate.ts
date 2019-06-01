@@ -63,6 +63,29 @@ export class UserDelegate {
         }
     }
 
+    async retrieveFriends(body: any): Promise<any> {
+        try {
+            let contacts: Array<string> = [];
+            let contactsUIResponse: Array<string> = [];
+            body.contacts.forEach((contact: any) => {
+                contact.contact.replace(/[+]/g, '').substr(-10);
+                contacts.push(contact.contact);
+            });
+            let elasticSearchQueryBuilder: ElasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+            elasticSearchQueryBuilder.addProperty(QueryProperties.QueryInclude, { terms: { contact: contacts } });
+            let userFriendsData = await this.elasticSearch.fetchDataByQuery(elasticSearchQueryBuilder.query, Config.USER_TABLE.INDEX, Config.USER_TABLE.MAPPING);
+            userFriendsData.forEach((userFriend: any) => {
+                if (contactsUIResponse.indexOf(userFriend._source.contact) < 0) {
+                    contactsUIResponse.push(userFriend._source.contact);
+                }
+            });
+            return contactsUIResponse;
+        } catch (error) {
+            winston.error(JSON.stringify(error));
+            return Promise.reject({ isAuthenticated: false });
+        }
+    }
+
     // async searchedPlace(body: UserPlacesRequest) {
     //     try {
     //         let elasticSearchQueryBuilder: ElasticSearchQueryBuilder = new ElasticSearchQueryBuilder();

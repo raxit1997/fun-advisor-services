@@ -7,6 +7,10 @@ import { GetCityIDRequest } from '../models/zomato/GetCityIDRequest';
 import { ResponseUtility } from '../utils/response-utility';
 import { Config } from '../config/config';
 import { FoodService } from '../services/food-service';
+import { ElasticSearchQueryBuilder, QueryProperties } from '../utils/elastic-search-query-builder';
+import { ElasticSearch } from '../services/di.config';
+import { RecommenderPlace } from '../models/user/RecommenderPlace';
+import { Places } from '../models/user/ESMapping';
 
 @Service()
 @Controller()
@@ -14,7 +18,8 @@ export class FoodController {
 
     responseUtility: ResponseUtility;
 
-    constructor(@Inject('zomato.api') private zomatoAPI: ZomatoAPI, @Inject('food.service') private foodService: FoodService) {
+    constructor(@Inject('zomato.api') private zomatoAPI: ZomatoAPI, @Inject('food.service') private foodService: FoodService,
+        @Inject('elastic.search') private elasticSearch: ElasticSearch) {
         this.responseUtility = new ResponseUtility();
     }
 
@@ -27,6 +32,7 @@ export class FoodController {
             let requestURL: string = `${Config.ZOMATO_BASE_URL}/search?
             lat=${body.latitude}&lon=${body.longitude}&order=${body.order ? body.order : 'asc'}
             &sort=${body.sortBy}&start=${body.start}`;
+            let places: Array<string> = new Array<string>();
             if(body.cuisineIDs) {
                 requestURL+=`&cuisines=${body.cuisineIDs}`;
             }
@@ -43,9 +49,33 @@ export class FoodController {
             if(body.searchQuery) {
                 requestURL+=`&q=${body.searchQuery}`;
             }
+            let recommenderPlaces: Array<RecommenderPlace> = [];
             let response: any = await this.zomatoAPI.fetchData(requestURL);
-            let result = this.foodService.fetchRestaurantResponse(response);
-            return this.responseUtility.generateResponse(true, result);
+            let elasticSearchQueryBuilder: ElasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+            if (Array.isArray(body.userID)) {
+                elasticSearchQueryBuilder.addProperty(QueryProperties.QueryInclude, { terms: { userID: body.userID } });
+            } else {
+                elasticSearchQueryBuilder.addProperty(QueryProperties.QueryInclude, { match: { userID: body.userID } });
+            }
+            let responses: any = await Promise.all([
+                this.foodService.fetchRestaurantResponse(response),
+                this.elasticSearch.fetchDataByQuery(elasticSearchQueryBuilder.query, Config.USER_PLACES_TABLE.INDEX, Config.USER_PLACES_TABLE.MAPPING)
+            ]);
+            let userPlacesResponse: Array<any> = responses[1];
+            userPlacesResponse.forEach((userPlace: any) => {
+                places.push(userPlace._source.placeID);
+            });
+            elasticSearchQueryBuilder = new ElasticSearchQueryBuilder();
+            elasticSearchQueryBuilder.addProperty(QueryProperties.QueryInclude, { terms: { placeID: places } });
+            let placesResponseFromES: Array<any> = await this.elasticSearch.fetchDataByQuery(elasticSearchQueryBuilder.query, Config.PLACES_TABLE.INDEX, Config.PLACES_TABLE.MAPPING);
+            placesResponseFromES.forEach((placeResponse: Places) => {
+                let recommenderPlace: RecommenderPlace = new RecommenderPlace();
+                recommenderPlace.averageRating = placeResponse.averageRating;
+                recommenderPlace.ratingCount = placeResponse.ratingCount;
+                recommenderPlace.placeID = placeResponse.placeID;
+                recommenderPlaces.push(recommenderPlace);
+            });
+            return this.responseUtility.generateResponse(true, responses[0]);
         } catch (error) {
             return this.responseUtility.generateResponse(false, error);
         }
