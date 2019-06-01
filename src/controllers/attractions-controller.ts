@@ -135,7 +135,7 @@ export class AttractionsController {
             attraction.ratingCount = candidate.user_ratings_total;
             for (let index = 0; index < placesResponse.length; index++) {
                 if (placesResponse[index]._id === candidate.place_id) {
-                    attraction.rating = placesResponse[index]._source.averageRating;
+                    attraction.rating = placesResponse[index]._source.averageRating === 0? placesResponse[index]._source.averageRating : placesResponse[index]._source.averageRating.toFixed(1);
                     attraction.ratingCount = placesResponse[index]._source.ratingCount;
                     break;
                 }

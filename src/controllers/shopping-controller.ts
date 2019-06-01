@@ -56,14 +56,17 @@ export class ShoppingController {
             shop.address = candidate.formatted_address;
             shop.openNow = candidate.opening_hours ? candidate.opening_hours.open_now : '-';
             shop.placeId = candidate.place_id;
-            shop.rating = candidate.rating;
+            if(candidate.rating === 0) {
+                candidate.rating = '-';
+            }
+            shop.rating = candidate.rating ;
             shop.types = candidate.types;
             shop.latitude = candidate.geometry.lat;
             shop.longitude = candidate.geometry.lng;
             shop.ratingCount = candidate.user_ratings_total;
             for (let index = 0; index < placesResponse.length; index++) {
                 if (placesResponse[index]._id === candidate.place_id) {
-                    shop.rating = placesResponse[index]._source.averageRating;
+                    shop.rating = placesResponse[index]._source.averageRating === 0? placesResponse[index]._source.averageRating : placesResponse[index]._source.averageRating.toFixed(1);
                     shop.ratingCount = placesResponse[index]._source.ratingCount;
                     break;
                 }
