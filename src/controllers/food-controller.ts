@@ -63,7 +63,7 @@ export class FoodController {
             let placesCategories: any = {};
             let userPlacesResponse: Array<any> = responses[1];
             userPlacesResponse.forEach((userPlace: any) => {
-                if (userPlace._source.categoryName === 'FOOD') {
+                if (userPlace._source.categoryName === 'FOOD' && userPlace._source.placeID) {
                     places.push(userPlace._source.placeID);
                     placesCategories[userPlace._source.placeID] = userPlace._source.subCategories.join(', ');
                 }
@@ -99,14 +99,23 @@ export class FoodController {
                     });
                 });
                 if(body.budget && result) {
-                    const restaurants = result.map(res => {
-                        if(res.cost <= body.budget) {
-                            return res;
+                    let restaurants = new Array<any>();
+                    for(let i = 0; i < result.length; i++) {
+                        let res = result[i];
+                        if(res && res.cost <= body.budget && res.restaurantName) {
+                           restaurants.push(res);
                         }
-                    })
+                    }
                     return this.responseUtility.generateResponse(true, restaurants);
                 } else {
-                    return this.responseUtility.generateResponse(true, result);
+                    let restaurants = new Array<any>();
+                    for(let i = 0; i < result.length; i++) {
+                        let res = result[i];
+                        if(res && res.restaurantName) {
+                           restaurants.push(res);
+                        }
+                    }
+                    return this.responseUtility.generateResponse(true, restaurants);
                 }
             } else {
                 return this.responseUtility.generateResponse(true, zomatoAPIResponse);
