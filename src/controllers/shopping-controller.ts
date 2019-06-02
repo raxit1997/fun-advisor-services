@@ -61,8 +61,8 @@ export class ShoppingController {
             }
             shop.rating = candidate.rating ;
             shop.types = candidate.types;
-            shop.latitude = candidate.geometry.lat;
-            shop.longitude = candidate.geometry.lng;
+            shop.latitude = candidate.geometry.location.lat;
+            shop.longitude = candidate.geometry.location.lng;
             shop.ratingCount = candidate.user_ratings_total;
             for (let index = 0; index < placesResponse.length; index++) {
                 if (placesResponse[index]._id === candidate.place_id) {
