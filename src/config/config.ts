@@ -23,7 +23,7 @@ export class Config {
     };
     public static WATSON_API_KEY : string = 'zVGmCt-qPvwIrXNFzlcV9l399ArWG1d93kcSa7BWBTi-';
     public static WATSON_CLASSIFIER : string = '0af0c8x553-nlc-35';
-    public static GOOGLE_PLACES_KEY : string = 'AIzaSyCCGb_0fod9vxW27A5iuYwNbW_x2JiCAvc';
+    public static GOOGLE_PLACES_KEY : string = 'AIzaSyAIobRY-GzOLqLzFzsX-GYkgPkYDuHqWxU';
     public static WATSON_REVIEW_CLASSIFIERS: any = {
         "Positive-Customer-Service": "PositiveCustomerService",
         "Negative-Customer-Service": "NegativeCustomerService",
