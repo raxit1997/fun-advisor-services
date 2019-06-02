@@ -21,16 +21,16 @@ export class AttractionsController {
     @Post('/nearByAttractions')
     async nearByAttractions(@Req() req: any, @Res() res: any, @Body() body: any): Promise<any> {
         try {
-            let latitude = req.headers.latitude;
-            let longitude = req.headers.longitude;
-            let queryString = 'top+attractions';
+            let latitude = req.body.latitude;
+            let longitude = req.body.longitude;
+            let queryString = 'popular+places';
             let placeId = req.body.placeId;
-            let mode =  req.body.mode;
+            let mode = req.body.mode;
             let requestURL = `https://maps.googleapis.com/maps/api/place/textsearch/json?key=${Config.GOOGLE_PLACES_KEY}&query=${queryString}&location=${latitude},${longitude}`;
             let response: any = await this.googleMapsAPI.fetchData(requestURL);
             response = this.sortLocations(response, latitude, longitude, placeId);
             // let matrix = await this.getDistanceMatrix(placeId, response[0].name, response[1].name, response[2].name, response[3].name, response[4].name);
-            let matrix = await this.getDistanceMatrix(placeId, response[0].geometry.location.lat, response[0].geometry.location.lng, response[1].geometry.location.lat, response[1].geometry.location.lng, response[2].geometry.location.lat, response[2].geometry.location.lng, response[3].geometry.location.lat, response[3].geometry.location.lng, response[4].geometry.location.lat, response[4].geometry.location.lng, mode)
+            let matrix = await this.getDistanceMatrix(placeId, response[0].geometry.location.lat, response[0].geometry.location.lng, response[1].geometry.location.lat, response[1].geometry.location.lng, response[2].geometry.location.lat, response[2].geometry.location.lng, mode)
             return this.responseUtility.generateResponse(true, { matrix: matrix });
         } catch (err) {
             return { isSuccess: false };
@@ -39,12 +39,12 @@ export class AttractionsController {
     }
 
 
-     async getDistanceMatrix(placeID: string, lat1: number, lng1: number, lat2: number, lng2: number, lat3: number, lng3: number, lat4: number, lng4: number, lat5: number, lng5: number , mode : string) {
- 
-         let requestURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&destinations=${lat1},${lng1}|${lat2},${lng2}|${lat3},${lng3}|${lat4},${lng4}|${lat5},${lng5}|&origins=place_id:${placeID}|${lat1},${lng1}|${lat2},${lng2}|${lat3},${lng3}|${lat4},${lng4}&key=AIzaSyAIobRY-GzOLqLzFzsX-GYkgPkYDuHqWxU&mode=${mode}`;
-         let response: any = await this.googleMapsAPI.fetchData(requestURL);
-         return response;
-     } 
+    async getDistanceMatrix(placeID: string, lat1: number, lng1: number, lat2: number, lng2: number, lat3: number, lng3: number, mode: string) {
+
+        let requestURL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&destinations=${lat1},${lng1}|${lat2},${lng2}|${lat3},${lng3}&origins=place_id:${placeID}|${lat1},${lng1}|${lat2},${lng2}|${lat3},${lng3}&key=AIzaSyDy_MdEZwBMFtFoVj-SGakLalcEzU-oGlw&mode=${mode}`;
+        let response: any = await this.googleMapsAPI.fetchData(requestURL);
+        return response;
+    }
 
     sortLocations(response: any, lat: number, lng: number, placeID: string) {
         try {
@@ -130,12 +130,12 @@ export class AttractionsController {
             attraction.placeId = candidate.place_id;
             attraction.rating = candidate.rating;
             attraction.types = candidate.types;
-            attraction.latitude = candidate.geometry.lat;
-            attraction.longitude = candidate.geometry.lng;
+            attraction.latitude = candidate.geometry.location.lat;
+            attraction.longitude = candidate.geometry.location.lng;
             attraction.ratingCount = candidate.user_ratings_total;
             for (let index = 0; index < placesResponse.length; index++) {
                 if (placesResponse[index]._id === candidate.place_id) {
-                    attraction.rating = placesResponse[index]._source.averageRating === 0? placesResponse[index]._source.averageRating : placesResponse[index]._source.averageRating.toFixed(1);
+                    attraction.rating = placesResponse[index]._source.averageRating === 0 ? placesResponse[index]._source.averageRating : placesResponse[index]._source.averageRating.toFixed(1);
                     attraction.ratingCount = placesResponse[index]._source.ratingCount;
                     break;
                 }
