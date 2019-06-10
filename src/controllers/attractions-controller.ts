@@ -31,7 +31,7 @@ export class AttractionsController {
             response = this.sortLocations(response, latitude, longitude, placeId);
             // let matrix = await this.getDistanceMatrix(placeId, response[0].name, response[1].name, response[2].name, response[3].name, response[4].name);
             let matrix = await this.getDistanceMatrix(placeId, response[0].geometry.location.lat, response[0].geometry.location.lng, response[1].geometry.location.lat, response[1].geometry.location.lng, response[2].geometry.location.lat, response[2].geometry.location.lng, mode)
-            return this.responseUtility.generateResponse(true, { matrix: matrix });
+            return this.responseUtility.generateResponse(true, { matrix: matrix , results : response });
         } catch (err) {
             return { isSuccess: false };
         }
