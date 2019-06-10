@@ -118,7 +118,7 @@ export class FoodController {
                     return this.responseUtility.generateResponse(true, restaurants);
                 }
             } else {
-                return this.responseUtility.generateResponse(true, zomatoAPIResponse);
+                return this.responseUtility.generateResponse(true, responses[0]);
             }
         } catch (error) {
             return this.responseUtility.generateResponse(false, error);
