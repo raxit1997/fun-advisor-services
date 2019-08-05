@@ -14,7 +14,7 @@ export class RecommenderAPI {
 
     async fetchData(placesData: RecommenderModel): Promise<any> {
         try {
-            const requestURL = `http://192.168.100.155:5002/recommendations`
+            const requestURL = `http://192.168.100.137:5002/recommendations`
             return new Promise((resolve: any, reject: any) => {
             post({
                 url: requestURL,
