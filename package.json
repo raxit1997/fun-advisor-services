@@ -39,7 +39,7 @@
     "@types/request": "0.0.45",
     "@types/winston": "2.3.7",
     "concurrently": "3.4.0",
-    "node-sass": "4.7.2",
+    "node-sass": "4.14.1",
     "nodemon": "1.11.0",
     "shelljs": "0.7.7",
     "tslint": "5.0.0",
